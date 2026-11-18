@@ -1,0 +1,32 @@
+/* Barrel for the vendored @appcharge/newgen-system-design files (verbatim copies of the package src at
+ * web-store-platform de1aa206). The one file written here; see README.md. */
+export * from "./components/domain/data-table";
+export * from "./components/domain/empty-state";
+export * from "./components/domain/filter-bar";
+export * from "./components/domain/order-status-badge";
+export * from "./components/domain/page-header";
+export * from "./components/ui/alert-dialog";
+export * from "./components/ui/alert";
+export * from "./components/ui/badge";
+export * from "./components/ui/breadcrumb";
+export * from "./components/ui/button";
+export * from "./components/ui/card";
+export * from "./components/ui/checkbox";
+export * from "./components/ui/command";
+export * from "./components/ui/dialog";
+export * from "./components/ui/dropdown-menu";
+export * from "./components/ui/flex";
+export * from "./components/ui/input";
+export * from "./components/ui/label";
+export * from "./components/ui/multi-select";
+export * from "./components/ui/popover";
+export * from "./components/ui/select";
+export * from "./components/ui/separator";
+export * from "./components/ui/skeleton";
+export * from "./components/ui/spinner";
+export * from "./components/ui/table";
+export * from "./components/ui/tabs";
+export * from "./components/ui/textarea";
+export * from "./components/ui/tooltip";
+export * from "./components/ui/typography";
+export { cn as dsCn } from "./utils/cn";

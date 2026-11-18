@@ -1,0 +1,66 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction" />
+
+<div className="font-sans text-foreground max-w-3xl">
+
+<p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
+  Storybook — New Gen Wire
+</p>
+
+# Navigation & Project Structure
+
+A production design system built on the **shadcn/ui** foundation — clean, minimal,
+neutral and technical — focused on **navigation and project structure** patterns.
+
+Use the sidebar to explore. Toggle **light / dark** and **viewport** from the
+toolbar above to preview any story responsively in either theme.
+
+---
+
+## Foundations
+
+The visual foundation is the shadcn **`base-vega`** preset (base color `stone`,
+restrained radius `0`, Tabler icons). All color, typography, spacing and radius
+values are exposed as **CSS variables and semantic tokens** — never hardcoded.
+The **Foundations** section is complete:
+
+<div className="grid gap-2 my-6">
+  {[
+    ["Colors", "Semantic tokens in light + dark, read live from the DOM."],
+    ["Typography", "Manrope + Geist Mono, with measured type-scale metrics."],
+    ["Spacing", "The 4px modular scale, visualized."],
+    ["Grid & Layout", "Container, 12-col grid, gaps, alignment, responsive."],
+    ["Icons", "Curated Tabler set with search and stroke control."],
+    ["Elevation", "Border-led surface hierarchy and a restrained shadow ramp."],
+    ["Motion", "Live hover, focus, collapse, dropdown, tooltip and modal."],
+    ["Breakpoints", "Mobile-first scale with a live active-breakpoint readout."],
+  ].map(([title, desc]) => (
+    <div
+      key={title}
+      className="flex items-start gap-4 border border-border bg-card text-card-foreground p-4"
+    >
+      <div>
+        <div className="font-medium">{title}</div>
+        <div className="text-muted-foreground text-sm">{desc}</div>
+      </div>
+    </div>
+  ))}
+</div>
+
+---
+
+## Architecture
+
+The system is layered — each layer composes the one above it, nothing is
+duplicated unnecessarily:
+
+**shadcn primitives → Appcharge atoms → composite components → patterns →
+product components → pages.**
+
+## Information architecture
+
+Foundations · Atoms · Form & Controls · Navigation · Data Display · Feedback ·
+Layout · Patterns · Product Components · Pages.
+
+</div>
