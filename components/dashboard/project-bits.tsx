@@ -58,9 +58,6 @@ export function useModulesOf() {
   );
 }
 
-/** Company badge colours by company (default: the brand blue). King: its gold. */
-const COMPANY_MARK_BG: Record<string, string> = { King: "linear-gradient(180deg, #FFC93C 0%, #F5A000 100%)" };
-
 /** The company's mark (breadcrumb, Folders & projects): a round badge with its initials, in the company's colour. */
 export function CompanyMark({ client, className }: { client: ClientConfig; className?: string }) {
   const initials = client.company.name
@@ -69,11 +66,20 @@ export function CompanyMark({ client, className }: { client: ClientConfig; class
     .join("")
     .slice(0, 2)
     .toUpperCase();
+  // The company's own logo when it has one (lib/newgen.ts); otherwise its initials on a colour.
+  const brand = client.company.brandColors ?? [];
+  if (client.company.logo) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- a small static brand mark
+      <img src={client.company.logo} alt="" aria-hidden className={cn("size-5 shrink-0 rounded-full object-cover", className)} />
+    );
+  }
   return (
     <span
       aria-hidden
       className={cn("flex size-5 shrink-0 items-center justify-center rounded-full bg-[#4F46E5] text-[9px] font-semibold text-white", className)}
-      style={COMPANY_MARK_BG[client.company.name] ? { background: COMPANY_MARK_BG[client.company.name] } : undefined}
+      // No logo: the company's brand colours, when it has them.
+      style={brand.length ? { background: `linear-gradient(180deg, ${brand[0]} 0%, ${brand[1] ?? brand[0]} 100%)` } : undefined}
     >
       {initials}
     </span>

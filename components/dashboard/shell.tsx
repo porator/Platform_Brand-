@@ -480,7 +480,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 {/* On a project's Overview the AI prompt is the page's main interaction: a greeting and the composer,
                     centred. Sending one opens the AI workspace (ai-workspace.tsx). Company and folder Overviews keep the
                     floating Ask AI bar instead. */}
-                {section === "home" && !isCompany && !assistant?.open ? <OverviewPrompt className="mt-24 mb-24" /> : null}
+                {section === "home" && !isCompany && !assistant?.open ? <OverviewPrompt className="mt-24 mb-12" /> : null}
                 {children}
               </main>
             </RouteTransition>

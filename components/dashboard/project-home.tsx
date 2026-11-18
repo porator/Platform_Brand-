@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import {
   IconBuildingStore,
   IconCheck,
-  IconChecklist,
   IconChevronRight,
   IconCopy,
   IconExternalLink,
@@ -23,6 +22,8 @@ import { MODULE_ICON } from "@/components/dashboard/project-bits";
 import { OnboardingDialog, OnboardingEntry } from "@/components/dashboard/onboarding-timeline";
 import { PageHeaderActions } from "@/components/dashboard/page-header-slot";
 import { TeamSection } from "@/components/dashboard/team-setup";
+import { OverviewCarousel } from "@/components/dashboard/overview-carousel";
+import { projectBrand } from "@/components/brand-dna/use-brand-context";
 import { useFolderTree, useSandboxes } from "@/components/dashboard/providers";
 import { effectiveAccess, findTrail, isProjectId } from "@/lib/folders";
 import { stepsFor, type GoLiveStep } from "@/lib/setup";
@@ -40,9 +41,6 @@ const STEP_HELP: Record<string, string> = {
   "domain-payment-links": "Choose the address your Payment Links use.",
   "domain-direct-checkout": "Choose the address your checkout opens on.",
 };
-/** The picture beside the setup guide (Figma 130:2442): a warm cream-to-gold wash, orange in the lower-left corner. */
-/** The image beside the go-live guide (Figma 128:6925, "Rectangle 8"). */
-const GUIDE_ART = "/overview/guide-art.png";
 /** How many go-live steps the Overview shows at once (the full list is in the setup checklist). */
 const VISIBLE_STEPS = 5;
 /** The setup guide's green (Figma 128:1997): done ticks, their rail, "Done" and the progress bar. */
@@ -60,6 +58,14 @@ const STEP_TIME: Record<string, string> = {
 };
 /** A step's short name for buttons and "Next: …" (the part before any brackets). */
 const shortLabel = (s: GoLiveStep) => s.label.replace(/\s*\(.*\)\s*$/, "");
+/** The open step's button ("Set up awarding", Figma 137:9684): short enough that it, Send to a developer and Mark as
+ *  done always share one line. Steps not listed use their name. */
+const SETUP_BUTTON: Record<string, string> = {
+  secure: "Set up request signing",
+  "player-auth": "Set up player login",
+  personalization: "Set up personalization",
+};
+const setupLabel = (s: GoLiveStep) => SETUP_BUTTON[s.id] ?? `Set up ${shortLabel(s).toLowerCase()}`;
 
 /**
  * Project Overview (new project, usability test 004): the lean page — the setup guide inline (1), the store and its
@@ -110,21 +116,17 @@ export function ProjectHome({ project }: { project: Project }) {
         </Button>
       </PageHeaderActions>
 
+      {/* What Appcharge can do (Figma 137:9684): a carousel between the AI prompt and the go-live guide. */}
+      <OverviewCarousel className="mb-3" />
+
       {/* 1 · Setup guide: the go-live steps on the page, the next one open with its own button. Folds away once
           every module is live. */}
       {setup.steps.length ? (
-        // Figma 130:2442: a picture card (381 × 365, Figma 128:6604) beside the go-live timeline; stacked on narrow screens.
+        // Figma 130:2442 / 137:9684: a picture card (381 × 365) beside the go-live timeline; stacked on narrow screens.
         <div className="grid items-start gap-7 md:grid-cols-[minmax(0,381px)_minmax(0,1fr)]">
-        <div aria-hidden="true" className="@container relative aspect-[381/365] w-full overflow-hidden rounded-[18px]">
-          {/* Figma's image fill is scaled to 40.8% and turned 13.2°; in cqw so the crop holds at any card width. */}
-          {/* eslint-disable-next-line @next/next/no-img-element -- static decorative art with a custom transform */}
-          <img
-            src={GUIDE_ART}
-            alt=""
-            className="absolute top-0 left-0 h-auto w-[123.26cqw] max-w-none origin-top-left"
-            style={{ transform: "translate(9.21cqw, -51.5cqw) rotate(13.207deg)" }}
-          />
-        </div>
+        {/* The picture card (Figma 137:9684, "Rectangle 8"): grey waves with fine grain and a white point, filling the card. */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- static decorative art */}
+        <img src="/overview/guide-art.jpg" alt="" aria-hidden className="aspect-[381/365] w-full rounded-[18px] object-cover" />
         <SetupGuide
           project={project}
           steps={setup.steps}
@@ -202,8 +204,7 @@ function SetupGuide({
     // green dot and opens with its buttons; done steps get a green tick.
     <section aria-labelledby="setup-guide-title" className="flex min-w-0 flex-col gap-3">
       <div className="flex items-center gap-2 border-b border-border pb-4">
-        <IconChecklist className="size-5 text-foreground" />
-        <h2 id="setup-guide-title" className="text-base font-semibold text-foreground">
+        <h2 id="setup-guide-title" className="text-base font-semibold text-[#272727]">
           Get {project.project} live
         </h2>
         <span className="text-[13px] text-muted-foreground">
@@ -223,7 +224,7 @@ function SetupGuide({
           const rail = isDoneStep
             ? `linear-gradient(${GUIDE_GREEN}, rgb(255 255 255 / 0))`
             : isOpen
-              ? "linear-gradient(#F1F7F3, rgb(255 255 255 / 0))"
+              ? "linear-gradient(#AFAEAD, rgb(255 255 255 / 0))"
               : "linear-gradient(#F5F5F4 31%, rgb(255 255 255 / 0))";
           return (
             <li key={s.id} className="relative grid grid-cols-[28px_minmax(0,1fr)_auto] items-start gap-x-4">
@@ -240,10 +241,14 @@ function SetupGuide({
                     <IconCheck className="size-2.5" weight="bold" />
                   </span>
                 ) : (
-                  // The step in progress: a pale green ring with a dark centre; the rest: grey ring, faint centre.
-                  <span className={cn("flex size-3.5 items-center justify-center rounded-full", isOpen ? "bg-[#F1F7F3]" : "bg-[#F5F5F4]")}>
-                    <span className={cn("size-1.5 rounded-full", isOpen ? "bg-[#292828]" : "bg-[rgb(12_10_8/0.3)]")} />
-                  </span>
+                  // The step in progress: an empty dashed ring (Figma 137:9684); the rest: grey ring, faint centre.
+                  isOpen ? (
+                    <span className="size-3.5 rounded-full border border-dashed border-[#AFAEAD]" />
+                  ) : (
+                    <span className="flex size-3.5 items-center justify-center rounded-full bg-[#F5F5F4]">
+                      <span className="size-1.5 rounded-full bg-[rgb(12_10_8/0.3)]" />
+                    </span>
+                  )
                 )}
               </button>
 
@@ -254,8 +259,7 @@ function SetupGuide({
                   disabled={isDoneStep}
                   className={cn(
                     "flex min-w-0 items-center gap-2 text-left text-sm leading-6 outline-none focus-visible:underline",
-                    isDoneStep ? "text-muted-foreground" : "text-foreground",
-                    isOpen && "font-semibold",
+                    isDoneStep ? "text-[#43C171]" : isOpen ? "font-semibold text-[#272727]" : "text-[#AFAEAD]",
                   )}
                 >
                   <span className="truncate">{s.label}</span>
@@ -263,16 +267,16 @@ function SetupGuide({
                 {isOpen ? (
                   <div className="mt-1 flex flex-col gap-3">
                     <p className="text-[13px] leading-5 text-muted-foreground">{STEP_HELP[s.id] ?? "Finish this step to go live."}</p>
-                    {/* One line, always. The step's name is right above, so the button just says "Set up" (the full name
-                        is its accessible name); the label would truncate before anything wraps. */}
-                    <div className="flex min-w-0 flex-nowrap items-center gap-2">
+                    {/* One line, always: a short "Set up …" (Figma 137:9684); it would truncate before anything wrapped. */}
+                    {/* The times column only sits beside the step names, so the actions run on under it (-mr-10). */}
+                    <div className="-mr-10 flex min-w-0 flex-nowrap items-center gap-2">
                       <Button
                         size="sm"
                         className="h-8 min-w-0 shrink px-3 text-nav"
                         nativeButton={false}
-                        render={<Link href={hrefFor(s)} aria-label={`Set up ${shortLabel(s).toLowerCase()}`} title={`Set up ${shortLabel(s).toLowerCase()}`} />}
+                        render={<Link href={hrefFor(s)} title={setupLabel(s)} />}
                       >
-                        <span className="truncate">Set up</span>
+                        <span className="truncate">{setupLabel(s)}</span>
                       </Button>
                       <Button
                         size="sm"
@@ -283,7 +287,7 @@ function SetupGuide({
                         <IconMailForward />
                         Send to a developer
                       </Button>
-                      <button type="button" onClick={() => toggle(s.id)} className="ml-1 shrink-0 text-xs whitespace-nowrap text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
+                      <button type="button" onClick={() => toggle(s.id)} className="ml-1 shrink-0 text-xs whitespace-nowrap text-muted-foreground underline underline-offset-2 hover:text-foreground">
                         Mark as done
                       </button>
                     </div>
@@ -469,5 +473,5 @@ function TeamCard({ project, client, firstTime }: { project: Project; client: Re
   const { root } = useFolderTree(client);
   const trail = findTrail(root, isProjectId(project.id)) ?? [root];
   const inherited = effectiveAccess(client, trail);
-  return <TeamSection projectId={project.id} projectName={project.project} firstTime={firstTime} inherited={inherited} />;
+  return <TeamSection projectId={project.id} projectName={project.project} firstTime={firstTime} inherited={inherited} brand={projectBrand(project)} />;
 }

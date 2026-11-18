@@ -641,7 +641,15 @@ export function CreateProjectFlow({ modal }: { modal?: { initial: string; onClos
   const onboarding = params.get("onboarding") === "1";
 
   return (
-    <div className={cn("font-brand grid bg-background lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]", modal ? "relative h-full min-h-0 grid-rows-[minmax(0,1fr)]" : "min-h-svh")}>
+    // In the dialog on wide screens the preview panel's colour is the whole surface, and the steps sit in a white card
+    // inset 3px into it (the same frame as the Invite teammates modal).
+    <div
+      className={cn(
+        "font-brand grid bg-background lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]",
+        modal ? "relative h-full min-h-0 grid-rows-[minmax(0,1fr)] transition-colors duration-500 lg:bg-(--panel) lg:p-[3px]" : "min-h-svh",
+      )}
+      style={modal ? ({ "--panel": theme.panel } as React.CSSProperties) : undefined}
+    >
       {/* The dialog's close, in its top-right corner (on the preview panel on wide screens). */}
       {modal ? (
         <button
@@ -653,7 +661,14 @@ export function CreateProjectFlow({ modal }: { modal?: { initial: string; onClos
           <IconX className="size-5" />
         </button>
       ) : null}
-      <section className={cn("flex flex-col px-6 pt-5 pb-8 sm:px-12 lg:px-16", modal ? "h-full min-h-0" : "min-h-svh")}>
+      <section
+        className={cn(
+          "flex flex-col px-6 pt-5 pb-8 sm:px-12 lg:px-16",
+          modal
+            ? "relative h-full min-h-0 bg-background lg:rounded-[12px] lg:border lg:border-black/[0.06] lg:shadow-[0_1px_2px_rgb(12_10_9/0.06),0_8px_24px_-4px_rgb(12_10_9/0.12)]"
+            : "min-h-svh",
+        )}
+      >
         {/* Top of the column: the step progress. Back is in the bottom bar, across from Continue. */}
         {primary ? (
           <div className="mt-3 h-1 w-full max-w-[34rem] overflow-hidden rounded-full bg-muted" role="progressbar" aria-label="Progress" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
