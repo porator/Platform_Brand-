@@ -41,6 +41,8 @@ const STEP_HELP: Record<string, string> = {
   "domain-payment-links": "Choose the address your Payment Links use.",
   "domain-direct-checkout": "Choose the address your checkout opens on.",
 };
+/** The picture card beside the go-live steps (hidden for now). */
+const SHOW_GUIDE_ART = false;
 /** How many go-live steps the Overview shows at once (the full list is in the setup checklist). */
 const VISIBLE_STEPS = 5;
 /** The setup guide's green (Figma 128:1997): done ticks, their rail, "Done" and the progress bar. */
@@ -123,10 +125,13 @@ export function ProjectHome({ project }: { project: Project }) {
           every module is live. */}
       {setup.steps.length ? (
         // Figma 130:2442 / 137:9684: a picture card (381 × 365) beside the go-live timeline; stacked on narrow screens.
-        <div className="grid items-start gap-7 md:grid-cols-[minmax(0,381px)_minmax(0,1fr)]">
-        {/* The picture card (Figma 137:9684, "Rectangle 8"): grey waves with fine grain and a white point, filling the card. */}
-        {/* eslint-disable-next-line @next/next/no-img-element -- static decorative art */}
-        <img src="/overview/guide-art.jpg" alt="" aria-hidden className="aspect-[381/365] w-full rounded-[18px] object-cover" />
+        <div className={cn("grid items-start gap-7", SHOW_GUIDE_ART && "md:grid-cols-[minmax(0,381px)_minmax(0,1fr)]")}>
+        {/* The picture card (Figma 137:9684, "Rectangle 8"): grey waves with fine grain and a white point, filling the card.
+            Hidden for now; the go-live steps take the full width. Flip SHOW_GUIDE_ART to bring it back. */}
+        {SHOW_GUIDE_ART ? (
+          // eslint-disable-next-line @next/next/no-img-element -- static decorative art
+          <img src="/overview/guide-art.jpg" alt="" aria-hidden className="aspect-[381/365] w-full rounded-[18px] object-cover" />
+        ) : null}
         <SetupGuide
           project={project}
           steps={setup.steps}
@@ -138,6 +143,10 @@ export function ProjectHome({ project }: { project: Project }) {
         />
         </div>
       ) : null}
+
+      {/* Who has access, right after the go-live steps (inherited from the folders above). A new project (or a
+          first-time company) starts with "Set up your team"; after an invite, People with access. */}
+      <TeamCard project={project} client={client} firstTime={setup.created || client.id.startsWith("acme-ft")} />
 
       {/* Direct Checkout: the ~3-week onboarding plan (Confluence: Onboarding - Web Checkout). */}
       {hasCheckout ? (
@@ -154,16 +163,13 @@ export function ProjectHome({ project }: { project: Project }) {
       </div>
 
 
-      {/* 6 · Who has access (inherited from the folders above). */}
-      {/* A new project (or a first-time company) starts with "Set up your team"; after an invite, People with access. */}
-      <TeamCard project={project} client={client} firstTime={setup.created || client.id.startsWith("acme-ft")} />
-
       <StorePreviewDialog project={project} open={storeOpen} onOpenChange={setStoreOpen} />
     </div>
   );
 }
 
-const CARD = "overflow-hidden rounded-2xl border border-border bg-card shadow-card";
+// The Overview cards: 18px corners, a soft half-strength border and a lifted shadow.
+const CARD = "overflow-hidden rounded-[18px] border border-[rgb(231_229_228/0.5)] bg-white shadow-[0_8px_24px_0_rgb(0_0_0/0.10),0_1px_2px_0_rgb(0_0_0/0.04)]";
 const CARD_HEAD = "flex items-center gap-2 border-b border-border px-5 py-3";
 
 /* ------------------------------------------------------------------------------------------------------------------ */

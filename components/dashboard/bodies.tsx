@@ -233,6 +233,21 @@ function useFolderScope(client: ClientConfig, folderId: string) {
 
 /** A folder's Home: the roll-up of every project in it and its sub-folders —
  *  the one rule that replaces the old Company, Studio and Game views. */
+/** The organization's banner: its Brand DNA, logo and name, with a line under the name. */
+function OrgBanner({ client, children }: { client: ClientConfig; children: React.ReactNode }) {
+  return (
+    <BrandDNA {...organizationBrand(client)} className="rounded-[18px]">
+      <div className="flex min-h-[132px] items-end gap-3 p-6">
+        <CompanyLogo clientId={client.id} className="size-10 shrink-0 rounded-full" />
+        <div className="min-w-0">
+          <p className="truncate font-brand text-[22px] leading-tight font-medium tracking-[-0.01em] text-[#272727]">{client.company.name}</p>
+          <p className="truncate text-[13px] text-foreground/70">{children}</p>
+        </div>
+      </div>
+    </BrandDNA>
+  );
+}
+
 export function FolderBody({ client, folderId }: { client: ClientConfig; folderId: string }) {
   const { wireframe } = useWireframe();
   const { folder, items } = useFolderScope(client, folderId);
@@ -248,7 +263,7 @@ export function FolderBody({ client, folderId }: { client: ClientConfig; folderI
 
   if (!items.length) {
     const subFolders = folder.children.filter((c) => c.kind === "folder").length;
-    return (
+    const empty = (
       <EmptyState
         icon={<IconFolderFilled className="size-5" />}
         title={subFolders ? "No projects in this folder yet" : folder.id === ROOT_FOLDER_ID ? "Start by organizing your company" : "No projects in this folder yet"}
@@ -273,6 +288,15 @@ export function FolderBody({ client, folderId }: { client: ClientConfig; folderI
           </Button>
         }
       />
+    );
+    // The organization's Overview carries its Brand DNA even before it has anything in it.
+    return folder.id === ROOT_FOLDER_ID ? (
+      <div className="flex flex-col gap-6">
+        <OrgBanner client={client}>{subFolders ? `${subFolders} ${subFolders === 1 ? "folder" : "folders"}, no projects yet` : "No folders or projects yet"}</OrgBanner>
+        {empty}
+      </div>
+    ) : (
+      empty
     );
   }
   // New project always comes with New folder beside it, as the secondary action. Compact (32px, 13px text), in the
@@ -304,17 +328,9 @@ export function FolderBody({ client, folderId }: { client: ClientConfig; folderI
       {/* The organization's Overview carries its Brand DNA: a banner in the company's colours, with the totals line on it.
           Folders inside keep the plain line in the header row. */}
       {folder.id === ROOT_FOLDER_ID ? (
-        <BrandDNA {...organizationBrand(client)} className="rounded-[18px]">
-          <div className="flex min-h-[132px] items-end gap-3 p-6">
-            <CompanyLogo clientId={client.id} className="size-10 shrink-0 rounded-full" />
-            <div className="min-w-0">
-              <p className="truncate font-brand text-[22px] leading-tight font-medium tracking-[-0.01em] text-[#272727]">{client.company.name}</p>
-              <p className="truncate text-[13px] text-foreground/70">
-                Totals for {items.length} {items.length === 1 ? "project" : "projects"} in {folder.name} and its sub-folders
-              </p>
-            </div>
-          </div>
-        </BrandDNA>
+        <OrgBanner client={client}>
+          Totals for {items.length} {items.length === 1 ? "project" : "projects"} in {folder.name} and its sub-folders
+        </OrgBanner>
       ) : (
         <PageHeaderMeta>
           Totals for {items.length} {items.length === 1 ? "project" : "projects"} in {folder.name} and its sub-folders

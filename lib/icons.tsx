@@ -97,6 +97,7 @@ import {
   InfoIcon,
   KanbanIcon,
   KeyIcon,
+  GoogleLogoIcon,
   LayoutIcon,
   LifebuoyIcon,
   LightningIcon,
@@ -123,6 +124,11 @@ import {
   PathIcon,
   PencilSimpleIcon,
   PlayIcon,
+  PauseIcon,
+  TextAlignLeftIcon,
+  TextAlignCenterIcon,
+  TextAlignRightIcon,
+  CornersOutIcon,
   PlugIcon,
   PlugsConnectedIcon,
   PlusIcon,
@@ -298,6 +304,7 @@ export const IconInbox = icon(TrayIcon, "IconInbox");
 export const IconInfoCircle = icon(InfoIcon, "IconInfoCircle");
 export const IconInnerShadowTop = icon(CircleHalfIcon, "IconInnerShadowTop");
 export const IconKey = icon(KeyIcon, "IconKey");
+export const IconBrandGoogle = icon(GoogleLogoIcon, "IconBrandGoogle", true);
 export const IconLanguage = icon(TranslateIcon, "IconLanguage");
 export const IconLayoutColumns = icon(ColumnsIcon, "IconLayoutColumns");
 export const IconLayoutDashboard = icon(SquaresFourIcon, "IconLayoutDashboard");
@@ -334,6 +341,11 @@ export const IconPencil = icon(PencilSimpleIcon, "IconPencil");
 export const IconPin = icon(PushPinIcon, "IconPin");
 export const IconPinnedOff = icon(PushPinSlashIcon, "IconPinnedOff");
 export const IconPlayerPlay = icon(PlayIcon, "IconPlayerPlay");
+export const IconPlayerPause = icon(PauseIcon, "IconPlayerPause");
+export const IconAlignLeft = icon(TextAlignLeftIcon, "IconAlignLeft");
+export const IconAlignCenter = icon(TextAlignCenterIcon, "IconAlignCenter");
+export const IconAlignRight = icon(TextAlignRightIcon, "IconAlignRight");
+export const IconMaximize = icon(CornersOutIcon, "IconMaximize");
 export const IconPlug = icon(PlugIcon, "IconPlug");
 export const IconPlugConnected = icon(PlugsConnectedIcon, "IconPlugConnected");
 export const IconPlus = icon(PlusIcon, "IconPlus");

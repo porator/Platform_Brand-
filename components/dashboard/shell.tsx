@@ -66,6 +66,8 @@ import {
 } from "@/lib/newgen";
 import { findTrail, insertProject, isFolderId, isProjectId, projectsIn, trailNames } from "@/lib/folders";
 import { CompanyLogo } from "@/components/dashboard/logo";
+import { BrandDNA } from "@/components/brand-dna/brand-dna";
+import { organizationBrand } from "@/components/brand-dna/use-brand-context";
 
 /* ───────── Orientation (post-onboarding): what level you're on, and what's in it ───────── */
 
@@ -281,6 +283,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const label = sectionLabel(client, section);
   // An order's page (Orders ?order=<id>) brings its own title (Back, the order ID, previous / next).
   const ownHeader = section === "orders" && !!searchParams.get("order");
+  // King-level pages (company and folders) show the organization's Brand DNA banner instead of the plain header.
+  const orgBanner = isCompany && section !== "home" && !ownHeader;
 
   // Where you are in the folders (runtime folders included): named, not navigable, in the top bar.
   const { root, edit } = useFolderTree(client);
@@ -439,7 +443,23 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             <RouteTransition motion="none" className="flex min-h-0 flex-1 flex-col">
               {/* Pinned to the top of the workspace while the page scrolls, with a hairline under it (Shopify-style).
                   Not on the Overview (company, folder, project): it opens straight onto the AI prompt, like Shopify Home. */}
-              {section === "home" && !ownHeader ? null : (
+              {section === "home" && !ownHeader ? null : orgBanner ? (
+              // King-level pages wear the organization's Brand DNA (as on its Overview): the logo, the page's name and
+              // the company, with the page's description and actions on the banner instead of a sticky white bar.
+              <div className="px-4 pt-6 sm:px-6">
+                <BrandDNA {...organizationBrand(client)} className="rounded-[18px]">
+                  <div className="flex min-h-[132px] items-end gap-3 p-6">
+                    <CompanyLogo clientId={client.id} className="size-10 shrink-0 rounded-full" />
+                    <div className="min-w-0 flex-1">
+                      <h1 className="truncate font-brand text-[22px] leading-tight font-medium tracking-[-0.01em] text-[#272727]">{label}</h1>
+                      <p className="truncate text-[13px] text-foreground/70">{client.company.name}</p>
+                      <div id={PAGE_HEADER_META_ID} className="truncate text-[13px] text-foreground/70 empty:hidden" />
+                    </div>
+                    <div id={PAGE_HEADER_ACTIONS_ID} className="flex shrink-0 items-center gap-2" />
+                  </div>
+                </BrandDNA>
+              </div>
+              ) : (
               <header className={cn("px-4 sm:px-6", !ownHeader && "sticky top-0 z-10 border-b border-border/80 bg-white")}>
                 {/* The page header, Shopify-style: one compact row at the top of the workspace — the title (16px
                     semibold), a grey description beside it and the page's actions on the right. Pages fill the

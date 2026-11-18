@@ -8,9 +8,22 @@ import { usePathname } from "next/navigation";
 import { hasStarted, markStarted } from "@/lib/usability-session";
 import { DashboardProviders } from "@/components/dashboard/providers";
 import { DashboardShell } from "@/components/dashboard/shell";
+import { SignInReveal } from "@/components/auth/sign-in-transition";
+import { applyOrganization, readOrganization } from "@/lib/organization";
+
+/** The organization from onboarding (session), as a string snapshot: "" on the server and before onboarding. */
+const noSubscribe = () => () => {};
+const orgSnapshot = () => {
+  const o = readOrganization();
+  return o ? JSON.stringify(o) : "";
+};
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  // The organization set up in onboarding: written into the company record before anything renders, and the
+  // dashboard keyed on it, so after a refresh it re-renders with your organization instead of the sample one.
+  const org = React.useSyncExternalStore(noSubscribe, orgSnapshot, () => "");
+  if (org) applyOrganization(JSON.parse(org));
   // No intro: every dashboard page opens directly (a refresh or a shared link no longer starts over).
   if (!hasStarted()) markStarted();
   // The Settings and Store areas have their own two-pane chrome, and project
@@ -22,7 +35,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       pathname?.startsWith("/dashboard/review")) ??
     false;
   return (
-    <DashboardProviders>
+    <DashboardProviders key={org ? "org" : "sample"}>
+      {/* Right after signing in: the sign-in scene, full screen, dissolving to reveal the dashboard. */}
+      <SignInReveal />
       {/* Suspense boundary for URL-driven chrome (useSearchParams). */}
       <React.Suspense fallback={null}>
         {/* From the dashboard, Create project opens in a dialog over the page (onboarding keeps its full page). */}

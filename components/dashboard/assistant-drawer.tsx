@@ -175,7 +175,7 @@ export function AssistantPanel({
 
       <div className="p-3">
         {/* Floating prompt: 14px corners (DS xl, like the panels), the DS border token, see-through, and a soft drop shadow in the DS base black at 8%. */}
-        <div className="rounded-xl border border-border bg-transparent p-3 shadow-[0_10px_24px_0_rgb(0_0_0/0.08)] focus-within:border-foreground/25">
+        <div className="rounded-[18px] border border-[rgb(231_229_228/0.5)] bg-white p-3 shadow-[0_8px_24px_0_rgb(0_0_0/0.10),0_1px_2px_0_rgb(0_0_0/0.04)] focus-within:border-foreground/25">
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}

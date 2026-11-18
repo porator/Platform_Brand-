@@ -529,3 +529,40 @@
     .brand-dna { transition: none; }
   }
 }
+
+/* Sign in → dashboard: the dashboard fades in from white (components/auth/sign-in-transition.tsx). */
+.signin-reveal {
+  animation: signin-reveal 450ms ease-out both;
+}
+@keyframes signin-reveal {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .signin-reveal {
+    animation-duration: 1ms;
+  }
+}
+
+/* Sign in → onboarding: the sign-in scene cross-fades into onboarding's preview (components/auth/sign-in-transition.tsx). */
+.signin-handoff {
+  animation: signin-handoff 900ms ease-in-out 200ms both;
+}
+@keyframes signin-handoff {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .signin-handoff {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+}

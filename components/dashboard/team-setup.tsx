@@ -6,7 +6,6 @@ import {
   IconPlus,
   IconRefresh,
   IconUserPlus,
-  IconUsers,
   IconX,
 } from "@/lib/icons";
 import { Badge } from "@/components/ui/badge";
@@ -187,8 +186,9 @@ function Avatar({
   );
 }
 
+// Same frame as the Overview's other cards (project-home.tsx).
 const CARD =
-  "overflow-hidden rounded-2xl border border-border bg-card shadow-card";
+  "overflow-hidden rounded-[18px] border border-[rgb(231_229_228/0.5)] bg-white shadow-[0_8px_24px_0_rgb(0_0_0/0.10),0_1px_2px_0_rgb(0_0_0/0.04)]";
 
 /* ── The card: Team Setup (first time) or People with access ──────────────────────────────────────────────────────── */
 export function TeamSection({
@@ -227,7 +227,7 @@ export function TeamSection({
   if (firstTime && invites.length === 0)
     return (
       <>
-        <TeamSetupEmpty onInvite={() => setOpen(true)} />
+        <TeamSetupEmpty onInvite={() => setOpen(true)} brand={brand} />
         {dialog}
       </>
     );
@@ -246,22 +246,31 @@ export function TeamSection({
 }
 
 /** First time: what the team is for, one button, and a quiet "nobody yet". */
-function TeamSetupEmpty({ onInvite }: { onInvite: () => void }) {
+function TeamSetupEmpty({
+  onInvite,
+  brand,
+}: {
+  onInvite: () => void;
+  brand?: BrandContext;
+}) {
   return (
     <section
       className={cn(
         CARD,
-        "flex flex-col gap-4 p-5 sm:flex-row sm:items-center",
+        // The card is the image's frame: 6px all round, the image filling the card's height on the left.
+        "flex flex-col p-1.5 sm:flex-row sm:items-stretch",
       )}
       aria-labelledby="team-setup-title"
     >
-      <span
-        aria-hidden
-        className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground"
-      >
-        <IconUsers className="size-5" />
-      </span>
-      <div className="min-w-0 flex-1">
+      {/* The project's Brand DNA as the card's image (corners concentric with the card's 18px). */}
+      <BrandDNA
+        contextType={brand?.contextType ?? "project"}
+        contextId={brand?.contextId ?? "team"}
+        brandColors={brand?.brandColors}
+        brandIcon={brand?.brandIcon}
+        className="h-32 w-full shrink-0 rounded-[12px] sm:h-auto sm:min-h-32 sm:w-[210px]"
+      />
+      <div className="min-w-0 flex-1 self-center px-3.5 py-3.5 sm:py-4 sm:pl-7">
         <h2
           id="team-setup-title"
           className="text-sm font-semibold text-foreground"
@@ -269,8 +278,9 @@ function TeamSetupEmpty({ onInvite }: { onInvite: () => void }) {
           Set up your team
         </h2>
         <p className="mt-0.5 text-[13px] leading-5 text-muted-foreground">
-          Invite your teammates to help configure and launch your Webstore. Give
-          each person the right level of access.
+          Invite your teammates to help configure and launch your Webstore.
+          <br />
+          Give each person the right level of access.
         </p>
         {/* Nobody invited yet: three empty seats. */}
         <div className="mt-3 flex items-center gap-2">
@@ -290,7 +300,7 @@ function TeamSetupEmpty({ onInvite }: { onInvite: () => void }) {
       </div>
       <Button
         size="sm"
-        className="h-8 shrink-0 self-start px-3 text-nav sm:self-center"
+        className="mx-3.5 mb-3.5 h-8 shrink-0 self-start px-3 text-nav sm:my-0 sm:mr-3.5 sm:ml-0 sm:self-center"
         onClick={onInvite}
       >
         <IconUserPlus />
@@ -629,7 +639,10 @@ function InviteDialog({
                         </SelectTrigger>
                         <SelectContent
                           alignItemWithTrigger={false}
-                          className="w-80 p-1"
+                          // Opens under the Role field with its right edge on the field's, so it stays inside the form card.
+                          align="end"
+                          sideOffset={6}
+                          className="w-80 rounded-[10px] p-1"
                         >
                           {INVITE_ROLES.map((x) => (
                             <SelectItem

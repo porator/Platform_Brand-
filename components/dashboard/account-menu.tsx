@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   IconUser,
@@ -351,6 +352,7 @@ function ChangePasswordDialog({ open, onOpenChange }: { open: boolean; onOpenCha
  * submenu; Edit Profile and Change Password open focused dialogs.
  */
 export function AccountMenu({ variant = "icon" }: { variant?: "icon" | "full" }) {
+  const router = useRouter();
   const [lang, setLang] = React.useState<string>(() => {
     if (typeof window === "undefined") return "en";
     try {
@@ -476,7 +478,8 @@ export function AccountMenu({ variant = "icon" }: { variant?: "icon" | "full" })
 
           <DropdownMenuSeparator />
 
-          <DropdownMenuItem variant="destructive" onClick={() => toast("Signed out", { description: "You've been signed out of the demo." })}>
+          {/* Log out: back to the sign-in page (signing in again goes through organization onboarding). */}
+          <DropdownMenuItem variant="destructive" onClick={() => router.push("/login")}>
             <IconLogout />
             Log out
           </DropdownMenuItem>
