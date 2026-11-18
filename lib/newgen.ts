@@ -159,7 +159,15 @@ export type ClientId =
   | "acme-ft-empty";
 export type ClientConfig = {
   id: ClientId;
-  company: { name: string; plan: string; initials: string };
+  company: {
+    name: string;
+    plan: string;
+    initials: string;
+    /** The organization's brand colours, most characteristic first (hex). Its logo and its Brand DNA read them. */
+    brandColors?: string[];
+    /** The organization's logo (a round mark); shown wherever the company appears, instead of its initials. */
+    logo?: string;
+  };
   hasStudioLayer: boolean;
   projects: Project[];
   environments: Environment[];
@@ -723,7 +731,7 @@ const DEFAULT_SANDBOX: Environment = { id: "sandbox", name: "Sandbox", kind: "sa
 
 const PRODUCT_MADNESS: ClientConfig = {
   id: "product-madness",
-  company: { name: "King", plan: "Microsoft Gaming", initials: "K" },
+  company: { name: "King", plan: "Microsoft Gaming", initials: "K", brandColors: ["#FFC93C", "#F5A000"], logo: "/brands/king.webp" },
   hasStudioLayer: true,
   environments: [PRODUCTION, DEFAULT_SANDBOX],
   companyNav: COMPANY_NAV_FULL,
@@ -904,7 +912,7 @@ const ACME_FT_EMPTY: ClientConfig = {
   ...ACME,
   id: "acme-ft-empty",
   // Usability test: the participant's company is King, brand new (no folders, no projects yet).
-  company: { name: "King", plan: "Microsoft Gaming", initials: "K" },
+  company: { name: "King", plan: "Microsoft Gaming", initials: "K", brandColors: ["#FFC93C", "#F5A000"], logo: "/brands/king.webp" },
   // A first-time company's projects have Production only; a sandbox exists once the participant creates one.
   environments: [PRODUCTION],
   fixture: true,

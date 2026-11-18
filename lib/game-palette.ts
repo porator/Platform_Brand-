@@ -55,12 +55,13 @@ function loadPixels(src: string, size = 40): Promise<Uint8ClampedArray | null> {
       }
     };
     img.onerror = () => resolve(null);
-    img.src = `/api/image?url=${encodeURIComponent(src)}`;
+    // The app's own assets load directly; store artwork goes through the image proxy (allowed hosts only).
+    img.src = src.startsWith("/") || src.startsWith("data:") ? src : `/api/image?url=${encodeURIComponent(src)}`;
   });
 }
 
 /** Brand colours: the icon's pixels grouped into buckets, scored by how common and how vivid they are. */
-function brandColors(px: Uint8ClampedArray): string[] {
+function brandColors(px: Uint8ClampedArray, max = 3): string[] {
   const buckets = new Map<string, { r: number; g: number; b: number; n: number }>();
   for (let i = 0; i < px.length; i += 4) {
     if (px[i + 3] < 200) continue;
@@ -84,7 +85,7 @@ function brandColors(px: Uint8ClampedArray): string[] {
   const picked: typeof scored = [];
   for (const c of scored) {
     if (picked.every((p) => Math.min(Math.abs(p.h - c.h), 1 - Math.abs(p.h - c.h)) > 0.08 || Math.abs(p.l - c.l) > 0.25)) picked.push(c);
-    if (picked.length === 3) break;
+    if (picked.length === max) break;
   }
   return picked.map((c) => hex(c.r, c.g, c.b));
 }
@@ -164,4 +165,24 @@ export function paletteFromFile(file: File): Promise<GamePalette | null> {
     };
     img.src = url;
   });
+}
+
+const iconColorCache = new Map<string, string[] | null>();
+
+/** The brand colours read from an image (an app icon, say), most characteristic first; null when it can't be read.
+ *  Cached per image, so revisiting a project is instant. */
+export function iconBrandColors(src: string, max = 5): Promise<string[] | null> {
+  const key = `${src}|${max}`;
+  if (iconColorCache.has(key)) return Promise.resolve(iconColorCache.get(key) ?? null);
+  return loadPixels(src, 48).then((px) => {
+    const colors = px ? brandColors(px, max) : null;
+    iconColorCache.set(key, colors?.length ? colors : null);
+    return iconColorCache.get(key) ?? null;
+  });
+}
+
+/** The cached result of iconBrandColors, if it has been read: undefined while unread. */
+export function cachedIconBrandColors(src: string, max = 5): string[] | null | undefined {
+  const key = `${src}|${max}`;
+  return iconColorCache.has(key) ? (iconColorCache.get(key) ?? null) : undefined;
 }

@@ -1,4 +1,5 @@
 import { CLIENTS, type ClientId } from "@/lib/newgen";
+import { cn } from "@/lib/utils";
 
 /** Product Madness mark — white tornado/funnel on the brand blue. */
 function ProductMadnessLogo({ className }: { className?: string }) {
@@ -45,29 +46,13 @@ function GenericLogo({ className, initials = "AC" }: { className?: string; initi
   );
 }
 
-/** King mark (usability test company): a white "K" on King's gold. */
-function KingLogo({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden>
-      <defs>
-        <linearGradient id="king-gold" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#FFC93C" />
-          <stop offset="1" stopColor="#F5A000" />
-        </linearGradient>
-      </defs>
-      <rect width="24" height="24" rx="12" fill="url(#king-gold)" />
-      <text x="12" y="16.4" textAnchor="middle" fontSize="12" fontWeight="700" fill="#fff" fontFamily="system-ui, sans-serif">
-        K
-      </text>
-    </svg>
-  );
-}
-
 /** The right company logo for a client. */
 export function CompanyLogo({ clientId, className }: { clientId: ClientId; className?: string }) {
+  // The company's own logo when it has one (lib/newgen.ts).
+  const logo = CLIENTS[clientId]?.company.logo;
+  // eslint-disable-next-line @next/next/no-img-element -- a small static brand mark
+  if (logo) return <img src={logo} alt="" aria-hidden className={cn("rounded-full object-cover", className)} />;
   if (clientId === "generic") return <GenericLogo className={className} initials="CO" />;
-  // The usability test's company is King, both the first-time company and the full sample (product-madness).
-  if (clientId === "acme-ft-empty" || clientId === "product-madness") return <KingLogo className={className} />;
   // Other Acme variants: their own initials.
   if (clientId.startsWith("acme")) return <GenericLogo className={className} initials={CLIENTS[clientId]?.company.initials ?? "AG"} />;
   return clientId === "wooga" ? <WoogaLogo className={className} /> : <ProductMadnessLogo className={className} />;

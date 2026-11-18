@@ -34,6 +34,8 @@ import { baseModules, companyHref, MODULE_LABEL, projectHref, DEFAULT_ENV_ID, RO
 import { CompanyLogo } from "@/components/dashboard/logo";
 import { findTrail, isFolderId, leafLabel, projectsIn, sortChildren, trailNames } from "@/lib/folders";
 import { PageHeaderActions, PageHeaderMeta } from "@/components/dashboard/page-header-slot";
+import { BrandDNA } from "@/components/brand-dna/brand-dna";
+import { organizationBrand } from "@/components/brand-dna/use-brand-context";
 
 /** Test mode (wireframe): pages the usability test doesn't cover say so plainly, instead of showing a skeleton
  *  a participant might wait on or try to read. */
@@ -299,9 +301,25 @@ export function FolderBody({ client, folderId }: { client: ClientConfig; folderI
   return (
     <div className="flex flex-col gap-6">
       {/* In the page header row (shell.tsx): the description beside the title, the actions on the right. */}
-      <PageHeaderMeta>
-        Totals for {items.length} {items.length === 1 ? "project" : "projects"} in {folder.name} and its sub-folders
-      </PageHeaderMeta>
+      {/* The organization's Overview carries its Brand DNA: a banner in the company's colours, with the totals line on it.
+          Folders inside keep the plain line in the header row. */}
+      {folder.id === ROOT_FOLDER_ID ? (
+        <BrandDNA {...organizationBrand(client)} className="rounded-[18px]">
+          <div className="flex min-h-[132px] items-end gap-3 p-6">
+            <CompanyLogo clientId={client.id} className="size-10 shrink-0 rounded-full" />
+            <div className="min-w-0">
+              <p className="truncate font-brand text-[22px] leading-tight font-medium tracking-[-0.01em] text-[#272727]">{client.company.name}</p>
+              <p className="truncate text-[13px] text-foreground/70">
+                Totals for {items.length} {items.length === 1 ? "project" : "projects"} in {folder.name} and its sub-folders
+              </p>
+            </div>
+          </div>
+        </BrandDNA>
+      ) : (
+        <PageHeaderMeta>
+          Totals for {items.length} {items.length === 1 ? "project" : "projects"} in {folder.name} and its sub-folders
+        </PageHeaderMeta>
+      )}
       <PageHeaderActions>{newProject}</PageHeaderActions>
       {/* Test mode drops the totals (sample numbers aren't part of the test); the project list is the page. */}
       {wireframe ? null : <StatPanel title={`${folder.name} totals`} stats={stats} />}

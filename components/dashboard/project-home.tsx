@@ -23,6 +23,8 @@ import { MODULE_ICON } from "@/components/dashboard/project-bits";
 import { OnboardingDialog, OnboardingEntry } from "@/components/dashboard/onboarding-timeline";
 import { PageHeaderActions } from "@/components/dashboard/page-header-slot";
 import { TeamSection } from "@/components/dashboard/team-setup";
+import { BrandDNA } from "@/components/brand-dna/brand-dna";
+import { useBrandContext } from "@/components/brand-dna/use-brand-context";
 import { useFolderTree, useSandboxes } from "@/components/dashboard/providers";
 import { effectiveAccess, findTrail, isProjectId } from "@/lib/folders";
 import { stepsFor, type GoLiveStep } from "@/lib/setup";
@@ -41,8 +43,6 @@ const STEP_HELP: Record<string, string> = {
   "domain-direct-checkout": "Choose the address your checkout opens on.",
 };
 /** The picture beside the setup guide (Figma 130:2442): a warm cream-to-gold wash, orange in the lower-left corner. */
-/** The image beside the go-live guide (Figma 128:6925, "Rectangle 8"). */
-const GUIDE_ART = "/overview/guide-art.png";
 /** How many go-live steps the Overview shows at once (the full list is in the setup checklist). */
 const VISIBLE_STEPS = 5;
 /** The setup guide's green (Figma 128:1997): done ticks, their rail, "Done" and the progress bar. */
@@ -74,6 +74,8 @@ export function ProjectHome({ project }: { project: Project }) {
   const router = useRouter();
   const [storeOpen, setStoreOpen] = React.useState(false);
   const env = params.get("env") ?? DEFAULT_ENV_ID;
+  // This project's brand (its store palette and app icon) for the Brand DNA card.
+  const brand = useBrandContext(project);
 
   const hasStore = setup.modules.includes("webstore");
   const stepsDone = setup.steps.filter((s) => setup.isDone(s.id)).length;
@@ -115,16 +117,8 @@ export function ProjectHome({ project }: { project: Project }) {
       {setup.steps.length ? (
         // Figma 130:2442: a picture card (381 × 365, Figma 128:6604) beside the go-live timeline; stacked on narrow screens.
         <div className="grid items-start gap-7 md:grid-cols-[minmax(0,381px)_minmax(0,1fr)]">
-        <div aria-hidden="true" className="@container relative aspect-[381/365] w-full overflow-hidden rounded-[18px]">
-          {/* Figma's image fill is scaled to 40.8% and turned 13.2°; in cqw so the crop holds at any card width. */}
-          {/* eslint-disable-next-line @next/next/no-img-element -- static decorative art with a custom transform */}
-          <img
-            src={GUIDE_ART}
-            alt=""
-            className="absolute top-0 left-0 h-auto w-[123.26cqw] max-w-none origin-top-left"
-            style={{ transform: "translate(9.21cqw, -51.5cqw) rotate(13.207deg)" }}
-          />
-        </div>
+        {/* Brand DNA: the project's colours (its store palette, filled out from its app icon), same size and radius. */}
+        <BrandDNA {...brand} className="aspect-[381/365] w-full rounded-[18px]" />
         <SetupGuide
           project={project}
           steps={setup.steps}
